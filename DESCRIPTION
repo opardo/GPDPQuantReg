@@ -10,5 +10,5 @@ Description: Bayesian and nonparametric quantile regression,
 License: Personal
 Encoding: UTF-8
 LazyData: true
-Imports: pscl,
+Depends: pscl,
     tmvtnorm
