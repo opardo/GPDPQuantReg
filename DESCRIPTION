@@ -1,0 +1,14 @@
+Package: GPDPQuantReg
+Type: Package
+Title: Bayesian and Nonparametric Quantile Regression Modelling
+Version: 0.1.0
+Author: Omar Pardo
+Maintainer: Omar Pardo <omarpardog@gmail.com>
+Description: Bayesian and nonparametric quantile regression,
+    using Gaussian Processes to model the base function and Dirichlet Processes
+    for the error. MCMC algorithm is included.
+License: Personal
+Encoding: UTF-8
+LazyData: true
+Imports: pscl,
+    tmvtnorm
