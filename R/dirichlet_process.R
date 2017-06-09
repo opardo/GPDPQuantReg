@@ -7,7 +7,7 @@ update_DP_k <- function(k, eps, zetas, p, c_DP, d_DP, alpha) {
   ind_neg <- ind & (unname(eps) < 0)
   r <- sum(ind)
 
-  sigma_k <- pscl::rigamma(
+  sigma_k <- rigamma(
     1,
     c_DP + r,
     d_DP + p * sum(eps[ind_pos]) + (1-p) * sum(-eps[ind_neg])

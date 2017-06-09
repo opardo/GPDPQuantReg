@@ -5,7 +5,7 @@ update_b <- function(m, p, sigmas, zetas) {
 }
 
 update_f <- function(Y, M_X, K_XX, lambda, b) {
-  f <- tmvtnorm::rtmvnorm(
+  f <- rtmvnorm(
     n = 1,
     mean = as.vector(M_X + (lambda * K_XX) %*% b),
     sigma = lambda * K_XX,
@@ -35,7 +35,7 @@ update_lambda <- function(f, M_X, b, K_XX, K_XX_inv, n, c_lambda, d_lambda) {
   if (sum(prob > 0) > 0) {
     lambda <- sample(x = lambdas[prob > 0], size = 1, prob = prob[prob > 0])
   } else {
-    lambda <- pscl::rigamma(1, c_lambda, d_lambda)
+    lambda <- rigamma(1, c_lambda, d_lambda)
   }
   return(lambda)
 }
