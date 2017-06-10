@@ -27,6 +27,12 @@ MCMC_GPDPQuantReg <- function(
   output$bad <- list()
   cont <- 1
 
+  # Scale data
+  scaled_mean <- attr(scale(Y), "scaled:center")
+  scaled_sigma <- attr(scale(Y), "scaled:scale")
+  X <- as.matrix(scale(X))
+  Y <- as.vector(scale(Y))
+
   # Fixed values
   xis <- (0.5)*(0.5)^(0:1e3)
   m <- dim(X)[1]
@@ -106,5 +112,11 @@ MCMC_GPDPQuantReg <- function(
     # Update number of classes truncation
     N <- update_N(classes)
   }
+
+  # Unscale parameters
+  output$sigmas <- lapply(output$sigmas, function(sigmas) sigmas * scaled_sigma)
+  output$f <- lapply(output$f, function(f) f * scaled_sigma + scaled_mean)
+  output$lambda <- lapply(output$lambda, function(lambda) lambda * scaled_sigma)
+
   return(output)
 }
