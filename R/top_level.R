@@ -7,7 +7,7 @@ MCMC_GPDPQuantReg <- function(
   c_DP = 2,
   d_DP = 1,
   c_lambda = 2,
-  d_lambda = 0.5 * sd(Y),
+  d_lambda = 0.5,
   alpha = sqrt(length(Y)),
   M = zero_function,
   mcit = 3e4,
