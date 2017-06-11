@@ -11,4 +11,7 @@ License: Personal
 Encoding: UTF-8
 LazyData: true
 Depends: pscl,
-    tmvtnorm
+    tmvtnorm,
+    coda,
+    reshape,
+    lattice
