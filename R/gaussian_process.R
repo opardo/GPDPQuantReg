@@ -32,7 +32,7 @@ update_lambda <- function(f, M_X, b, K_XX, K_XX_inv, n, c_lambda, d_lambda) {
   }
   prob <- fx(lambdas)
 
-  if (any(prob > 0)) {
+  if (sum(prob > 1e-60) > 1) {
     lambda <- sample(x = lambdas[prob > 0], size = 1, prob = prob[prob > 0])
   } else {
     lambda <- rigamma(1, c_lambda, d_lambda)
