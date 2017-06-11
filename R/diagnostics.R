@@ -51,14 +51,14 @@ diagnostic_ergodicity <- function(MCMC_test) {
   it_means <- it_means[, which(colnames(it_means) %in% c("sigma", "N", "lambda", "f"))]
   melted_it_means <- melt(it_means) 
   colnames(melted_it_means) <- c("iterations", "parameter", "value")
-  ergodicity_plot <- xyplot(
+  plot(xyplot(
     value ~ iterations | parameter,
     type = "l",
     data = melted_it_means,
     scales = list(y = list(relation="free")),
     main="Ergodicity", 
-  )
-  return(ergodicity_plot)
+  ))
+  # return(ergodicity_plot)
 }
 
 diagnostic_crosscorrelation <- function(MCMC_test) {
