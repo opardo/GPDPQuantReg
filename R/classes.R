@@ -2,19 +2,16 @@
 
 update_class_i <- function(i, xis, zetas, pis, eps, sigmas, N, p) {
   u <- runif(n = 1, min = 0, max = xis[zetas[i]])
-  if(any(is.na((xis[1:N] > u) * pis / xis[1:N] * dalp(eps[i], sigma = sigmas, p = p)))) {
-    zeta_i <- sample(
-      1,
-      x = 1:N,
-      prob = (xis[1:N] > u) *
-      pis / xis[1:N] *
-      dalp(eps[i], sigma = sigmas, p = p)
-    )
+  prob <- (xis[1:N] > u) * (pis / xis[1:N]) * dalp(eps[i], sigma = sigmas, p = p)
+
+  if(sum(prob > 0) > 1) {
+    zeta_i <- sample(1, x = 1:N, prob = prob)
   } else {
     zeta_i <- sample(1, x = 1:N)
   }
 
   N_i <- max((1:length(xis))[xis > u])
+
   return(list(
     zeta_i = zeta_i,
     N_i = N_i
