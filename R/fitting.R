@@ -14,7 +14,7 @@ fit_GPDPQuantReg <- function(
 ){
   
   # Load X and Y from data
-  formula <- update(formula, ~ . + 0)
+  formula <- delete_intercept(formula)
   mf <- model.frame(formula = formula, data = data)
   X <- model.matrix(attr(mf, "terms"), data = mf)
   Y <- model.response(data = mf)
@@ -77,7 +77,7 @@ fit_GPDPQuantReg <- function(
   eps <- Y - f
 
   # Gibbs sampler
-  cat(sprintf("There are %12d iterations.\n", mcit + burn))
+  cat(sprintf("There are in total %7d iterations.\n", mcit + burn))
   for(i in 1:(mcit+burn)){
 
     # Update Dirichlet Process
@@ -139,7 +139,7 @@ fit_GPDPQuantReg <- function(
     }
 
     if(i %% 1000 == 0){
-      cat(sprintf("%12d iterations.\n", i))
+      cat(sprintf("iteration: %6d \n", i))
     }
   }
 

@@ -26,3 +26,16 @@ get_K_XpX <- function(Xp, X) {
 get_quantile <- function(values, p) as.numeric(quantile(values, p))
 
 zero_function <- function(x) return(0 * x)
+
+delete_intercept <- function(formula) {
+  non_intercept_in_formula <- grepl("+0", gsub(" ", "", toString(formula[3])))
+  if(!non_intercept_in_formula) {
+    formula <- as.formula(paste(
+      toString(formula[2]),
+      "~",
+      toString(formula[3]),
+      "+0"
+    ))  
+  }
+  return(formula)
+}

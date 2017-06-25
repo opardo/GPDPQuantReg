@@ -2,13 +2,16 @@ predict_GPDPQuantReg <- function(GPDP_MCMC, predictive_data, credibility = 0.95)
   
   # Load needed metadata
   formula <- GPDP_MCMC$metadata$formula
+  
   original_data <- GPDP_MCMC$metadata$data
   original_mf <- model.frame(formula = formula, data = original_data)
+  
+  predictive_data[[toString(formula[2])]] <- 1 # little trick ;)
   predictive_mf <- model.frame(formula = formula, data = predictive_data)
   
-  X <- model.matrix(attr(mf, "terms"), data = original_mf)
+  X <- model.matrix(attr(original_mf, "terms"), data = original_mf)
   Y <- model.response(data = original_mf)
-  Xp <- model.matrix(attr(mf, "terms"), data = predictive_mf)
+  Xp <- model.matrix(attr(predictive_mf, "terms"), data = predictive_mf)
   MCMC_length <- GPDP_MCMC$metadata$mcit / GPDP_MCMC$metadata$thin
   M <- GPDP_MCMC$a_priori$M
   
