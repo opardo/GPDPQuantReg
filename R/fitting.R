@@ -1,6 +1,4 @@
-# TOP LEVEL FUNCTION
-
-MCMC_GPDPQuantReg <- function(
+fit_GPDP <- function(
   X,
   Y,
   p = 0.5,
@@ -16,20 +14,40 @@ MCMC_GPDPQuantReg <- function(
 ){
 
   # Repositories
-  output <- list()
-  output$sigmas <- list()
-  output$pis <- list()
-  output$zetas <- list()
-  output$N <- list()
-  output$b <- list()
-  output$lambda <- list()
-  output$f <- list()
-  output$bad <- list()
+  GPDP_MCMC <- list()
+  
+  GPDP_MCMC$parameters <- list()
+  GPDP_MCMC$parameters$sigmas <- list()
+  GPDP_MCMC$parameters$pis <- list()
+  GPDP_MCMC$parameters$zetas <- list()
+  GPDP_MCMC$parameters$N <- list()
+  GPDP_MCMC$parameters$b <- list()
+  GPDP_MCMC$parameters$lambda <- list()
+  GPDP_MCMC$parameters$f <- list()
+  GPDP_MCMC$parameters$bad <- list()
+  
+  GPDP_MCMC$a_priori <- list()
+  GPDP_MCMC$a_priori$c_DP <- c_DP 
+  GPDP_MCMC$a_priori$d_DP <- d_DP
+  GPDP_MCMC$a_priori$c_lambda <- c_lambda
+  GPDP_MCMC$a_priori$d_lambda <- d_lambda
+  GPDP_MCMC$a_priori$alpha <- alpha
+  GPDP_MCMC$a_priori$M <- M
+  
+  GPDP_MCMC$metadata <- list()
+  GPDP_MCMC$metadata$X <- X
+  GPDP_MCMC$metadata$Y <- Y
+  GPDP_MCMC$metadata$p <- p
+  GPDP_MCMC$metadata$mcit <- mcit
+  GPDP_MCMC$metadata$burn <- burn
+  GPDP_MCMC$metadata$thin <- thin
+  
   cont <- 1
 
   # Scale data
-  scaled_mean <- attr(scale(Y), "scaled:center")
-  scaled_sigma <- attr(scale(Y), "scaled:scale")
+  y_scaled_mean <- attr(scale(Y), "scaled:center")
+  y_scaled_sigma <- attr(scale(Y), "scaled:scale")
+  
   X <- as.matrix(scale(X))
   Y <- as.vector(scale(Y))
 
@@ -95,14 +113,14 @@ MCMC_GPDPQuantReg <- function(
 
     # Aux to delete burning simulations
     if(i > burn && (i - burn) %% thin == 0){
-      output$sigmas[[cont]] <- sigmas
-      output$pis[[cont]] <- pis
-      output$zetas[[cont]] <- zetas
-      output$N[[cont]] <- N
-      output$b[[cont]] <- b
-      output$lambda[[cont]] <- lambda
-      output$f[[cont]] <- f
-      output$bad[[cont]] <- bad
+      GPDP_MCMC$parameters$sigmas[[cont]] <- sigmas * y_scaled_sigma
+      GPDP_MCMC$parameters$pis[[cont]] <- pis
+      GPDP_MCMC$parameters$zetas[[cont]] <- zetas
+      GPDP_MCMC$parameters$N[[cont]] <- N
+      GPDP_MCMC$parameters$b[[cont]] <- b
+      GPDP_MCMC$parameters$lambda[[cont]] <- lambda * y_scaled_sigma
+      GPDP_MCMC$parameters$f[[cont]] <- f * y_scaled_sigma + y_scaled_mean
+      GPDP_MCMC$parameters$bad[[cont]] <- bad
       cont <- cont + 1
     }
 
@@ -114,10 +132,5 @@ MCMC_GPDPQuantReg <- function(
     N <- update_N(classes)
   }
 
-  # Unscale parameters
-  output$sigmas <- lapply(output$sigmas, function(sigmas) sigmas * scaled_sigma)
-  output$f <- lapply(output$f, function(f) f * scaled_sigma + scaled_mean)
-  output$lambda <- lapply(output$lambda, function(lambda) lambda * scaled_sigma)
-
-  return(output)
+  return(GPDP_MCMC)
 }
