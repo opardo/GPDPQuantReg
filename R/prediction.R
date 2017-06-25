@@ -1,9 +1,10 @@
-predict_GPDP <- function(GPDP_MCMC, Xp, credibility) {
+predict_GPDP <- function(GPDP_MCMC, Xp, credibility = 0.95) {
   
   # Load needed metadata
   X <- GPDP_MCMC$metadata$X
   Y <- GPDP_MCMC$metadata$Y
   MCMC_length <- GPDP_MCMC$metadata$mcit / GPDP_MCMC$metadata$thin
+  M <- GPDP_MCMC$a_priori$M
   
   # Get scale parameters
   X_scaled_means <- as.numeric(attr(scale(X), "scaled:center"))
@@ -30,26 +31,40 @@ predict_GPDP <- function(GPDP_MCMC, Xp, credibility) {
   
   # Get means and correlations for the Gaussian Process
   # original data
-  M_X <- M(X)
-  K_XX_inv <- solve(get_K_XX(X))
+  M_X <- M(scale(X))
+  K_XX_inv <- solve(get_K_XX(scale(X)))
   # predictive data
   M_Xp <- M(scaled_Xp)
   K_XpXp <- get_K_XX(scaled_Xp)
   # both
-  K_XpX <- get_K_XpX(scaled_Xp, X)
+  K_XpX <- get_K_XpX(scaled_Xp, scale(X))
   
   # Calculate fixed conditional parameters
-  Sigma <- K_XpXp - K_XpX %*% K_XX_inv %*% t(K_XpX)
+  Sigma <- round(K_XpXp - K_XpX %*% K_XX_inv %*% t(K_XpX), 10)
   Mu_aux <- K_XpX %*% K_XX_inv
   
+  # test <- list()
+  # for(i in 1:10) {
+  #   test[[i]] <- simulate_fp(
+  #     fitted_parameters[[i]],
+  #     Sigma,
+  #     M_Xp,
+  #     M_X,
+  #     Mu_aux,
+  #     y_scaled_sigma,
+  #     y_scaled_mean
+  #   )
+  # }
+  
   # Calculate predictive data's posterior
-  fp_list <- lapply(
-    parameters,
-    FUN = simulate_fp,
-    Sigma = Sigma, 
-    M_Xp = M_Xp, 
-    M_X = M_X, 
-    Mu_aux = Mu_aux
+  fp_list <- get_fp_posterior(
+    fitted_parameters,
+    Sigma,
+    M_Xp,
+    M_X,
+    Mu_aux,
+    y_scaled_sigma,
+    y_scaled_mean
   )
   
   fp_matrix <- data.frame(matrix(
@@ -80,12 +95,41 @@ predict_GPDP <- function(GPDP_MCMC, Xp, credibility) {
   return(prediction)
 }
 
-simulate_fp <- function(params, Sigma, M_Xp, M_X, Mu_aux) {
+get_fp_posterior <- function(
+  fitted_parameters,
+  Sigma,
+  M_Xp,
+  M_X,
+  Mu_aux,
+  y_scaled_sigma,
+  y_scaled_mean
+) {
+  return(lapply(
+    fitted_parameters,
+    FUN = simulate_fp,
+    Sigma = Sigma, 
+    M_Xp = M_Xp, 
+    M_X = M_X, 
+    Mu_aux = Mu_aux,
+    y_scaled_sigma = y_scaled_sigma,
+    y_scaled_mean = y_scaled_mean 
+  ))
+}
+
+simulate_fp <- function(
+  params,
+  Sigma,
+  M_Xp,
+  M_X,
+  Mu_aux,
+  y_scaled_sigma,
+  y_scaled_mean
+) {
   f <- params$f
   lambda <- params$lambda
-  Mu <- M_Xf + Mu_aux %*% (f - M_X)
+  Mu <- M_Xp + Mu_aux %*% (f - M_X)
   scaled_fp <- as.vector(rmvnorm(1, mean = Mu, sigma = lambda * Sigma))
   fp <- (scaled_fp * y_scaled_sigma) + y_scaled_mean
-  return(ff)
+  return(fp)
 }
 
