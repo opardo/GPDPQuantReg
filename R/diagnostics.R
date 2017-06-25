@@ -1,4 +1,4 @@
-diagnostic_GPDP <- function(GPDP_MCMC) {
+diagnostic_GPDPQuantReg <- function(GPDP_MCMC) {
   rand_obs <- sample(size = 1, x = 1:length(GPDP_MCMC$parameters$f[[1]]))
   
   zetas <- matrix(
@@ -32,10 +32,10 @@ diagnostic_GPDP <- function(GPDP_MCMC) {
     f
   ))
   
-  diagnostic_autocorrelation(MCMC_test)
   diagnostic_trace(MCMC_test)
-  diagnostic_ergodicity(MCMC_test)
+  diagnostic_autocorrelation(MCMC_test)
   diagnostic_crosscorrelation(MCMC_test)
+  diagnostic_ergodicity(MCMC_test)
 }
 
 diagnostic_autocorrelation <- function(MCMC_test) {

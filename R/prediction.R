@@ -1,8 +1,14 @@
-predict_GPDP <- function(GPDP_MCMC, Xp, credibility = 0.95) {
+predict_GPDPQuantReg <- function(GPDP_MCMC, predictive_data, credibility = 0.95) {
   
   # Load needed metadata
-  X <- GPDP_MCMC$metadata$X
-  Y <- GPDP_MCMC$metadata$Y
+  formula <- GPDP_MCMC$metadata$formula
+  original_data <- GPDP_MCMC$metadata$data
+  original_mf <- model.frame(formula = formula, data = original_data)
+  predictive_mf <- model.frame(formula = formula, data = predictive_data)
+  
+  X <- model.matrix(attr(mf, "terms"), data = original_mf)
+  Y <- model.response(data = original_mf)
+  Xp <- model.matrix(attr(mf, "terms"), data = predictive_mf)
   MCMC_length <- GPDP_MCMC$metadata$mcit / GPDP_MCMC$metadata$thin
   M <- GPDP_MCMC$a_priori$M
   
@@ -42,19 +48,6 @@ predict_GPDP <- function(GPDP_MCMC, Xp, credibility = 0.95) {
   # Calculate fixed conditional parameters
   Sigma <- round(K_XpXp - K_XpX %*% K_XX_inv %*% t(K_XpX), 10)
   Mu_aux <- K_XpX %*% K_XX_inv
-  
-  # test <- list()
-  # for(i in 1:10) {
-  #   test[[i]] <- simulate_fp(
-  #     fitted_parameters[[i]],
-  #     Sigma,
-  #     M_Xp,
-  #     M_X,
-  #     Mu_aux,
-  #     y_scaled_sigma,
-  #     y_scaled_mean
-  #   )
-  # }
   
   # Calculate predictive data's posterior
   fp_list <- get_fp_posterior(

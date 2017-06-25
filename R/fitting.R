@@ -1,6 +1,6 @@
-fit_GPDP <- function(
-  X,
-  Y,
+fit_GPDPQuantReg <- function(
+  formula,
+  data,
   p = 0.5,
   c_DP = 2,
   d_DP = 1,
@@ -12,7 +12,18 @@ fit_GPDP <- function(
   burn = 1e4,
   thin = 10
 ){
-
+  
+  # Load X and Y from data
+  formula <- update(formula, ~ . + 0)
+  mf <- model.frame(formula = formula, data = data)
+  X <- model.matrix(attr(mf, "terms"), data = mf)
+  Y <- model.response(data = mf)
+  
+  # Save used variables in formula
+  y_name <- toString(formula[2])
+  x_names <- colnames(X)
+  formula <- as.formula(paste0(y_name, " ~ ", paste(x_names, collapse= "+"), "+ 0"))
+  
   # Repositories
   GPDP_MCMC <- list()
   
@@ -24,7 +35,7 @@ fit_GPDP <- function(
   GPDP_MCMC$parameters$b <- list()
   GPDP_MCMC$parameters$lambda <- list()
   GPDP_MCMC$parameters$f <- list()
-  GPDP_MCMC$parameters$bad <- list()
+  GPDP_MCMC$parameters$alternative <- list()
   
   GPDP_MCMC$a_priori <- list()
   GPDP_MCMC$a_priori$c_DP <- c_DP 
@@ -35,15 +46,15 @@ fit_GPDP <- function(
   GPDP_MCMC$a_priori$M <- M
   
   GPDP_MCMC$metadata <- list()
-  GPDP_MCMC$metadata$X <- X
-  GPDP_MCMC$metadata$Y <- Y
+  GPDP_MCMC$metadata$formula <- formula
+  GPDP_MCMC$metadata$data <- data
   GPDP_MCMC$metadata$p <- p
   GPDP_MCMC$metadata$mcit <- mcit
   GPDP_MCMC$metadata$burn <- burn
   GPDP_MCMC$metadata$thin <- thin
   
   cont <- 1
-
+  
   # Scale data
   y_scaled_mean <- attr(scale(Y), "scaled:center")
   y_scaled_sigma <- attr(scale(Y), "scaled:scale")
@@ -66,7 +77,7 @@ fit_GPDP <- function(
   eps <- Y - f
 
   # Gibbs sampler
-  cat(sprintf("Son %6d iteraciones.\n", mcit + burn))
+  cat(sprintf("There are %12d iterations.\n", mcit + burn))
   for(i in 1:(mcit+burn)){
 
     # Update Dirichlet Process
@@ -84,14 +95,14 @@ fit_GPDP <- function(
 
     # Update Gaussian Process
     try_f <- NULL
-    global_chances <- 0
+    global_chances <- 1
 
-    while (global_chances < 3 & is.null(try_f) ) {
+    while (global_chances <= 3 & is.null(try_f) ) {
 
       try_lambda <- update_lambda(f, M_X, b, K_XX, K_XX_inv, n, c_lambda, d_lambda)
 
-      f_chances <- 0
-      while(f_chances < 4 & is.null(try_f)) {
+      f_chances <- 1
+      while(f_chances <= 3 & is.null(try_f)) {
         try_f <- update_f(Y, M_X, K_XX, try_lambda, b)
         f_chances <- f_chances + 1
       }
@@ -102,14 +113,17 @@ fit_GPDP <- function(
     if(is.null(try_f)) {
       f <- Y - random_asymmetric_error(sigmas[zetas], p)
       lambda <- update_lambda(f, M_X, b, K_XX, K_XX_inv, n, c_lambda, d_lambda)
-      bad <- 1
+      alternative <- 1
     } else {
       lambda <- try_lambda
       f <- try_f
-      bad <- 0
+      alternative <- 0
     }
 
     eps <- Y-f
+    
+    # Update number of classes truncation
+    N <- update_N(classes)
 
     # Aux to delete burning simulations
     if(i > burn && (i - burn) %% thin == 0){
@@ -120,16 +134,13 @@ fit_GPDP <- function(
       GPDP_MCMC$parameters$b[[cont]] <- b
       GPDP_MCMC$parameters$lambda[[cont]] <- lambda * y_scaled_sigma
       GPDP_MCMC$parameters$f[[cont]] <- f * y_scaled_sigma + y_scaled_mean
-      GPDP_MCMC$parameters$bad[[cont]] <- bad
+      GPDP_MCMC$parameters$alternative[[cont]] <- alternative
       cont <- cont + 1
     }
 
     if(i %% 1000 == 0){
-      cat(sprintf("Van %6d iteraciones.\n", i))
+      cat(sprintf("%12d iterations.\n", i))
     }
-
-    # Update number of classes truncation
-    N <- update_N(classes)
   }
 
   return(GPDP_MCMC)
