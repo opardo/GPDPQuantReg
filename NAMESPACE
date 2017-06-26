@@ -3,3 +3,5 @@
 S3method(diagnose,GPDP_MCMC)
 S3method(predict_GPDPQuantReg,GPDP_MCMC)
 export(GPDPQuantReg)
+export(diagnose)
+export(predict_GPDPQuantReg)
