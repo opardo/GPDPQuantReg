@@ -1,4 +1,37 @@
-fit_GPDPQuantReg <- function(
+#' Fits GPDPQuantReg
+#'
+#' @description Runs a MCMC algorithm to fit a quantile regression model, using Gaussian and
+#' Dirichlet Processes. Returns a GPDP_MCMC object with thinned chains.
+#' Scales data in the process so the induced correlation makes sense, and
+#' unscales at the end. Take it into account for the initial parameters.
+#'
+#' @usage GPDPQuantReg(
+#'   formula, data, p = 0.5, c_DP = 2, d_DP = 1, c_lambda = 2,
+#'   d_lambda = 0.5, alpha = sqrt(nrow(data)), M = zero_function,
+#'   mcit = 3e4, burn = 1e4, thin = 10
+#' )
+#' @param formula formula object with the dependent and independent variables
+#' @param data data frame
+#' @param p real between (0,1), probability corresponding to the estimated quantile
+#' @param c_DP real > 0, shape parameter for the DP's base distribution
+#' @param d_DP real > 0, scale parameter fot the DP's base distribution
+#' @param c_lambda real > 0, shape parameter for the GP's lambda distribution
+#' @param d_lambda real > 0, scale parameter fot the GP's lambda distribution
+#' @param alpha real > 0, DP's concentration parameter
+#' @param M function, a priori estimation for the final function
+#' @param mcit integer > 0, number of MCMC algorithm's valid chains
+#' @param burn integer > 0, number of MCMC algorithm's first burned chains
+#' @param thin integer > 0 and < mcit, MCMC algorithm's thinning
+#' @return GPDP_MCMC object, with the MCMC algorithm's chains
+#' @author Omar Pardo (omarpardog@gmail.com)
+#' @examples
+#' m <- 35
+#' x <- sort(sample(seq(-15, 15, 0.005), m))
+#' f_x <- function(x) return((1/40) * x^2 - (1/20) * x - 2)
+#' data <- data.frame(x = x, y = f_x(x) + rnorm(m, 0, 1))
+#' GPDP_MCMC <- fit_GPDPQuantReg(y ~ x, data, p = 0.250)
+#' @export
+GPDPQuantReg <- function(
   formula,
   data,
   p = 0.5,
@@ -6,61 +39,48 @@ fit_GPDPQuantReg <- function(
   d_DP = 1,
   c_lambda = 2,
   d_lambda = 0.5,
-  alpha = sqrt(length(Y)),
+  alpha = sqrt(nrow(data)),
   M = zero_function,
   mcit = 3e4,
   burn = 1e4,
   thin = 10
 ){
-  
+
   ptm <- proc.time()
-  
+
   # Load X and Y from data
   formula <- delete_intercept(formula)
   mf <- model.frame(formula = formula, data = data)
   X <- model.matrix(attr(mf, "terms"), data = mf)
   Y <- model.response(data = mf)
-  
+
   # Save used variables in formula
   y_name <- toString(formula[2])
   x_names <- colnames(X)
   formula <- as.formula(paste0(y_name, " ~ ", paste(x_names, collapse= "+"), "+ 0"))
-  
-  # Repositories
-  GPDP_MCMC <- list()
-  
-  GPDP_MCMC$parameters <- list()
-  GPDP_MCMC$parameters$sigmas <- list()
-  GPDP_MCMC$parameters$pis <- list()
-  GPDP_MCMC$parameters$zetas <- list()
-  GPDP_MCMC$parameters$N <- list()
-  GPDP_MCMC$parameters$b <- list()
-  GPDP_MCMC$parameters$lambda <- list()
-  GPDP_MCMC$parameters$f <- list()
-  GPDP_MCMC$parameters$alternative <- list()
-  
-  GPDP_MCMC$a_priori <- list()
-  GPDP_MCMC$a_priori$c_DP <- c_DP 
-  GPDP_MCMC$a_priori$d_DP <- d_DP
-  GPDP_MCMC$a_priori$c_lambda <- c_lambda
-  GPDP_MCMC$a_priori$d_lambda <- d_lambda
-  GPDP_MCMC$a_priori$alpha <- alpha
-  GPDP_MCMC$a_priori$M <- M
-  
-  GPDP_MCMC$metadata <- list()
-  GPDP_MCMC$metadata$formula <- formula
-  GPDP_MCMC$metadata$data <- data
-  GPDP_MCMC$metadata$p <- p
-  GPDP_MCMC$metadata$mcit <- mcit
-  GPDP_MCMC$metadata$burn <- burn
-  GPDP_MCMC$metadata$thin <- thin
-  
+
+  # Build GPDP_MCMC S3 object
+  GPDP_MCMC <- build_GPDP_MCMC(
+    formula,
+    data,
+    p,
+    mcit,
+    burn,
+    thin,
+    c_DP,
+    d_DP,
+    c_lambda,
+    d_lambda,
+    alpha,
+    M
+  )
+
   cont <- 1
-  
+
   # Scale data
   y_scaled_mean <- attr(scale(Y), "scaled:center")
   y_scaled_sigma <- attr(scale(Y), "scaled:scale")
-  
+
   X <- as.matrix(scale(X))
   Y <- as.vector(scale(Y))
 
@@ -123,7 +143,7 @@ fit_GPDPQuantReg <- function(
     }
 
     eps <- Y-f
-    
+
     # Update number of classes truncation
     N <- update_N(classes)
 
@@ -144,7 +164,7 @@ fit_GPDPQuantReg <- function(
       cat(sprintf("iteration: %6d \n", i))
     }
   }
-  
+
   GPDP_MCMC$metadata$time <- proc.time() - ptm
 
   return(GPDP_MCMC)

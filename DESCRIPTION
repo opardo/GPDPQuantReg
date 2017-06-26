@@ -16,3 +16,4 @@ Depends: pscl,
     reshape,
     lattice,
     doParallel
+RoxygenNote: 6.0.1
