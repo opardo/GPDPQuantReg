@@ -99,7 +99,7 @@ GPDPQuantReg <- function(
   eps <- Y - f
 
   # Gibbs sampler
-  cat(sprintf("There are in total %7d iterations.\n", mcit + burn))
+  cat(sprintf("Are total %6d iterations.\n", mcit + burn))
   for(i in 1:(mcit+burn)){
 
     # Update Dirichlet Process

@@ -32,8 +32,8 @@ predict_GPDPQuantReg.GPDP_MCMC <- function(
   original_data <- GPDP_MCMC$metadata$data
   original_mf <- model.frame(formula = formula, data = original_data)
 
-  predictive_data[[toString(formula[2])]] <- 1 # little trick ;)
-  predictive_mf <- model.frame(formula = formula, data = predictive_data)
+  # predictive_data[[toString(formula[2])]] <- 1 # little trick ;)
+  predictive_mf <- model.frame(formula = formula[-2], data = predictive_data)
 
   X <- model.matrix(attr(original_mf, "terms"), data = original_mf)
   Y <- model.response(data = original_mf)
