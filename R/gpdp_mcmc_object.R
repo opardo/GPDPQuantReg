@@ -66,7 +66,7 @@ dispatcher_creator <- function(function_name){
 #' x <- sort(sample(seq(-15, 15, 0.005), m))
 #' f_x <- function(x) return((1/40) * x^2 - (1/20) * x - 2)
 #' data <- data.frame(x = x, y = f_x(x) + rnorm(m, 0, 1))
-#' GPDP_MCMC <- fit_GPDPQuantReg(y ~ x, data, p = 0.250)
+#' GPDP_MCMC <- GPDPQuantReg(y ~ x, data, p = 0.250)
 #' diagnose(GPDP_MCMC)
 #' @export
 diagnose <- dispatcher_creator("diagnose")
