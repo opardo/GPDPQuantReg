@@ -1,6 +1,3 @@
-registerDoParallel()
-
-
 #' Predicts GPDPQuantReg
 #'
 #' Predicts after fitting a GPDPQuantReg
@@ -19,8 +16,8 @@ registerDoParallel()
 #' predictive_data <- data_frame(x = seq(-15, 15, 0.1))
 #' credibility <- 0.90
 #' predict(GPDP_MCMC, predictive_data, credibility)
-#' @export
-predict_GPDPQuantReg.GPDP_MCMC <- function(
+#' @export predict.GPDP_MCMC
+predict.GPDP_MCMC <- function(
   GPDP_MCMC,
   predictive_data,
   credibility = 0.95
@@ -79,8 +76,8 @@ predict_GPDPQuantReg.GPDP_MCMC <- function(
   Mu_aux <- K_XpX %*% K_XX_inv
 
   # Calculate predictive data's posterior
+  registerDoParallel()
   fp_list <- foreach(i = 1:length(fitted_parameters)) %dopar% {
-    print(i)
     simulate_fp(
       params = fitted_parameters[[i]],
       Sigma,

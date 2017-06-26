@@ -12,7 +12,7 @@
 #' data <- data.frame(x = x, y = f_x(x) + rnorm(m, 0, 1))
 #' GPDP_MCMC <- fit_GPDPQuantReg(y ~ x, data, p = 0.250)
 #' diagnose(GPDP_MCMC)
-#' @export
+#' @export diagnose.GPDP_MCMC
 diagnose.GPDP_MCMC <- function(GPDP_MCMC) {
   rand_obs <- sample(size = 1, x = 1:length(GPDP_MCMC$parameters$f[[1]]))
 

@@ -54,8 +54,19 @@ dispatcher_creator <- function(function_name){
   )
 }
 
+#' Diagnose GPDPQuantReg
+#'
+#' Run diagnostics for the GPDPQuantReg's Monte Carlo Markov Chains
+#'
+#' @param GPDP_MCMC A GPDP_MCMC object
+#' @return plots traces, autocorrelations, crosscorrelations and ergodicity
+#' @author Omar Pardo (omarpardog@gmail.com)
+#' @examples
+#' m <- 35
+#' x <- sort(sample(seq(-15, 15, 0.005), m))
+#' f_x <- function(x) return((1/40) * x^2 - (1/20) * x - 2)
+#' data <- data.frame(x = x, y = f_x(x) + rnorm(m, 0, 1))
+#' GPDP_MCMC <- fit_GPDPQuantReg(y ~ x, data, p = 0.250)
+#' diagnose(GPDP_MCMC)
 #' @export
 diagnose <- dispatcher_creator("diagnose")
-#' @export
-predict_GPDPQuantReg <- dispatcher_creator("predict_GPDPQuantReg")
-# GPDPQuantReg <- dispatcher_creator("GPDPQuantReg")
