@@ -71,7 +71,7 @@ diagnostic_ergodicity <- function(MCMC_test) {
     type = "l",
     data = melted_it_means,
     scales = list(y = list(relation="free")),
-    main="Ergodicity",
+    main="Ergodicity"
   ))
   # return(ergodicity_plot)
 }

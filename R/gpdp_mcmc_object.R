@@ -54,6 +54,8 @@ dispatcher_creator <- function(function_name){
   )
 }
 
+#' @export
 diagnose <- dispatcher_creator("diagnose")
+#' @export
 predict_GPDPQuantReg <- dispatcher_creator("predict_GPDPQuantReg")
 # GPDPQuantReg <- dispatcher_creator("GPDPQuantReg")
