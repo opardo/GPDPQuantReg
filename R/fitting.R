@@ -13,6 +13,8 @@ fit_GPDPQuantReg <- function(
   thin = 10
 ){
   
+  ptm <- proc.time()
+  
   # Load X and Y from data
   formula <- delete_intercept(formula)
   mf <- model.frame(formula = formula, data = data)
@@ -142,6 +144,8 @@ fit_GPDPQuantReg <- function(
       cat(sprintf("iteration: %6d \n", i))
     }
   }
+  
+  GPDP_MCMC$metadata$time <- proc.time() - ptm
 
   return(GPDP_MCMC)
 }

@@ -1,3 +1,5 @@
+registerDoParallel()
+
 predict_GPDPQuantReg <- function(GPDP_MCMC, predictive_data, credibility = 0.95) {
   
   # Load needed metadata
@@ -53,15 +55,18 @@ predict_GPDPQuantReg <- function(GPDP_MCMC, predictive_data, credibility = 0.95)
   Mu_aux <- K_XpX %*% K_XX_inv
   
   # Calculate predictive data's posterior
-  fp_list <- get_fp_posterior(
-    fitted_parameters,
-    Sigma,
-    M_Xp,
-    M_X,
-    Mu_aux,
-    y_scaled_sigma,
-    y_scaled_mean
-  )
+  fp_list <- foreach(i = 1:length(fitted_parameters)) %dopar% {
+    print(i)
+    simulate_fp(
+      params = fitted_parameters[[i]],
+      Sigma,
+      M_Xp,
+      M_X,
+      Mu_aux,
+      y_scaled_sigma,
+      y_scaled_mean
+    )
+  }
   
   fp_matrix <- data.frame(matrix(
     unlist(fp_list),
@@ -91,27 +96,6 @@ predict_GPDPQuantReg <- function(GPDP_MCMC, predictive_data, credibility = 0.95)
   return(prediction)
 }
 
-get_fp_posterior <- function(
-  fitted_parameters,
-  Sigma,
-  M_Xp,
-  M_X,
-  Mu_aux,
-  y_scaled_sigma,
-  y_scaled_mean
-) {
-  return(lapply(
-    fitted_parameters,
-    FUN = simulate_fp,
-    Sigma = Sigma, 
-    M_Xp = M_Xp, 
-    M_X = M_X, 
-    Mu_aux = Mu_aux,
-    y_scaled_sigma = y_scaled_sigma,
-    y_scaled_mean = y_scaled_mean 
-  ))
-}
-
 simulate_fp <- function(
   params,
   Sigma,
@@ -128,4 +112,3 @@ simulate_fp <- function(
   fp <- (scaled_fp * y_scaled_sigma) + y_scaled_mean
   return(fp)
 }
-
