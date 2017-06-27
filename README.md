@@ -6,8 +6,7 @@ Omar Pardo (omarpardog@gmail.com)
 
 ## Description
 
-Bayesian and nonparametric quantile regression, using Gaussian Processes to model the base function and Dirichlet Processes
-for the error, and a MCMC algorithm to fit the model.
+R Package. Bayesian and nonparametric quantile regression, using Gaussian Processes to model the base function, Dirichlet Processes for the error, and a MCMC algorithm to fit the model.
 
 ## Example
 
