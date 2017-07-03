@@ -16,33 +16,27 @@
 diagnose.GPDP_MCMC <- function(GPDP_MCMC) {
   rand_obs <- sample(size = 1, x = 1:length(GPDP_MCMC$parameters$f[[1]]))
 
-  zetas <- matrix(
+  zeta <- matrix(
     unlist(GPDP_MCMC$parameters$zetas),
     nrow = length(GPDP_MCMC$parameters$zetas),
     byrow = T
-  )
-  zeta <- zetas[ , rand_obs]
+  )[ , rand_obs]
 
   sigma <- unlist(lapply(
     1: length(zeta),
     function(i) GPDP_MCMC$parameters$sigmas[[i]][zeta[i]]
   ))
 
-  N <- unlist(GPDP_MCMC$parameters$N)
-
   lambda <- unlist(GPDP_MCMC$parameters$lambda)
 
-  fs <- matrix(
+  f <- matrix(
     unlist(GPDP_MCMC$parameters$f),
     nrow = length(GPDP_MCMC$parameters$f),
     byrow = T
-  )
-  f <- fs[, rand_obs]
+  )[, rand_obs]
 
   MCMC_test <- mcmc(cbind(
     sigma,
-    zeta,
-    N,
     lambda,
     f
   ))
