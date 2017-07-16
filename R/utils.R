@@ -4,7 +4,7 @@ get_K_XX <- function(X) {
   K <- matrix(nrow = m, ncol = m)
   for(i in 1:m) {
     for(j in 1:m){
-      K[i,j] <- exp(-as.numeric(dist(rbind(X[i,],X[j,]))))
+      K[i,j] <- exp(-as.numeric(dist(rbind(X[i,],X[j,]))) / ncol(X))
     }
   }
   return(K)
@@ -35,7 +35,7 @@ delete_intercept <- function(formula) {
       "~",
       toString(formula[3]),
       "+0"
-    ))  
+    ))
   }
   return(formula)
 }
