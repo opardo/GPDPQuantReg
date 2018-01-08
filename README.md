@@ -2,15 +2,15 @@
 
 ## Author
 
-Omar Pardo (omarpardog@gmail.com)
+Carlos Omar Pardo (omarpardog@gmail.com)
 
 ## Description
 
-R Package. Bayesian and nonparametric quantile regression, using Gaussian Processes to model the base function, Dirichlet Processes for the error, and a MCMC algorithm to fit the model.
+R Package. Bayesian and nonparametric quantile regression, using Gaussian Processes to model the trend, and Dirichlet Processes for the error. An MCMC algorithm works behind to fit the model.
 
 ## Example
 
-First, you must install the package directly from Github.
+First, you must install the package directly from Github. (I hope eventually you will do it from CRAN.)
 
 ```{r}
 library(devtools)
@@ -19,7 +19,7 @@ library(GPDPQuantReg)
 ```
 
 Then, you can create some artificial data to start familiarizing with the package's dynamic. In this case, 
-I'm using a complex base function and a non-normal error and sampling ONLY 20 POINTS.
+I'm using a complex trend function and a non-normal error, sampling ONLY 20 POINTS.
 
 ```{r}
 set.seed(201707)
@@ -38,18 +38,18 @@ Now, it's time to fit the model with a MCMC algorithm for a specific _p_ probabi
 GPDP_MCMC <- GPDPQuantReg(y ~ x, sample_data, p = 0.250)
 ```
 
-Since it is a non-parametric model, it is focused on prediction with a credible interval.
+Since it is a nonparametric model, it is focused on prediction with a credible interval.
 
 ```{r}
 predictive_data <- data_frame(x = seq(-15, 15, 0.25))
 credibility <- 0.90
 prediction <- predict(GPDP_MCMC, predictive_data, credibility)
 ```
-And for a complex base function, non-normal error and only 20 sampled points... we get AWESOME RESULTS!
+And for a complex trend function, non-normal error and only 20 sampled points... we get AWESOME RESULTS!
 
 ![Image of prediction](https://github.com/opardo/GPDPQuantReg/blob/master/images/prediction.png)
 
-Some diagnostics for the Markov Chains are available (ergodicity, autocorrelation, crosscorrelation and traces).
+Some diagnostics (ergodicity, autocorrelation, crosscorrelation and traces) for the Markov Chains are available too.
 
 ```{r}
 diagnose(GPDP_MCMC)
