@@ -4,7 +4,7 @@
 
 Carlos Omar Pardo (omarpardog@gmail.com)
 
-## Description
+## Overview
 
 R Package. Bayesian and nonparametric quantile regression, using Gaussian Processes to model the trend, and Dirichlet Processes for the error. An MCMC algorithm works behind to fit the model.
 
@@ -16,7 +16,7 @@ Be one dependent random variable _y_, and a vector of independent variables _x_,
 
 where _f<sub>p</sub>_ is the function which links _x_ to _y_, and epsilon is a dispersion random variable, such that its _p_-quantile is 0. Then, because the quantile of a sum is the sum of the quantiles, we get that  _q<sub>p</sub>(y|x)_ = _f<sub>p</sub>(x)_. This package is going to focus on estimating _f<sub>p</sub>_.
 
-We are going to address that problem by using the *GPDP model*, which is described below. (For a complete understanding, it is recommended to have some previous knowledge in _Gaussian Processes_ ([Bagnell's lecture](http://www.cs.cmu.edu/~16831-f14/notes/F09/lec21/16831_lecture21.sross.pdf)) and _Dirichlet Processes_ ([Teh 2010](https://www.stats.ox.ac.uk/~teh/research/npbayes/Teh2010a.pdf)), particularly, the stick-breaking representation). 
+We are going to address that problem by using the __GPDP model__, which is described below. (For a complete understanding, it is recommended to have some previous knowledge in _Gaussian Processes_ ([Bagnell's lecture](http://www.cs.cmu.edu/~16831-f14/notes/F09/lec21/16831_lecture21.sross.pdf)) and _Dirichlet Processes_ ([Teh 2010](https://www.stats.ox.ac.uk/~teh/research/npbayes/Teh2010a.pdf)), particularly, the stick-breaking representation). 
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=\inline&space;\dpi{150}&space;$$\begin{aligned}&space;y_i|&space;f_p(x_i),&space;z_i,&space;\sigma_k^*&space;&\sim&space;AL_p({\varepsilon_p}_i&space;=&space;y_i&space;-&space;f_p(x_i)&space;|&space;\sigma_{z_i}),&space;\\&space;f_p|m,&space;k,&space;\lambda&space;&\sim&space;\mathcal{GP}(m,k(\lambda)|\lambda),&space;\\&space;\lambda&space;&\sim&space;GI(c_\lambda,d_\lambda),&space;\\&space;z_i&space;|&space;\pi&space;&\sim&space;Mult_\infty(\pi),&space;\\&space;\pi&space;|&space;\alpha&space;&\sim&space;GEM(\alpha),&space;\\&space;\sigma_k^*&space;|&space;c_{DP},&space;d_{DP}&space;&\sim&space;GI(\sigma_k|c_{DP},&space;d_{DP}),\\&space;k(x_i,&space;x_j&space;|&space;\lambda)&space;&=&space;\lambda&space;\text{&space;}&space;exp\{-\norm{x_i&space;-&space;x_j}_2\}.&space;\end{aligned}$$" target="_blank"><img src="https://latex.codecogs.com/png.latex?\inline&space;\dpi{150}&space;$$\begin{aligned}&space;y_i|&space;f_p(x_i),&space;z_i,&space;\sigma_k^*&space;&\sim&space;AL_p({\varepsilon_p}_i&space;=&space;y_i&space;-&space;f_p(x_i)&space;|&space;\sigma_{z_i}),&space;\\&space;f_p|m,&space;k,&space;\lambda&space;&\sim&space;\mathcal{GP}(m,k(\lambda)|\lambda),&space;\\&space;\lambda&space;&\sim&space;GI(c_\lambda,d_\lambda),&space;\\&space;z_i&space;|&space;\pi&space;&\sim&space;Mult_\infty(\pi),&space;\\&space;\pi&space;|&space;\alpha&space;&\sim&space;GEM(\alpha),&space;\\&space;\sigma_k^*&space;|&space;c_{DP},&space;d_{DP}&space;&\sim&space;GI(\sigma_k|c_{DP},&space;d_{DP}),\\&space;k(x_i,&space;x_j&space;|&space;\lambda)&space;&=&space;\lambda&space;\text{&space;}&space;exp\{-||x_i&space;-&space;x_j||_2\}.&space;\end{aligned}$$" title="$$\begin{aligned} y_i| f_p(x_i), z_i, \sigma_k^* &\sim AL_p({\varepsilon_p}_i = y_i - f_p(x_i) | \sigma_{z_i}), \\ f_p|m, k, \lambda &\sim \mathcal{GP}(m,k(\lambda)|\lambda), \\ \lambda &\sim GI(c_\lambda,d_\lambda), \\ z_i | \pi &\sim Mult_\infty(\pi), \\ \pi | \alpha &\sim GEM(\alpha), \\ \sigma_k^* | c_{DP}, d_{DP} &\sim GI(\sigma_k|c_{DP}, d_{DP}),\\ k(x_i, x_j | \lambda) &= \lambda \text{ } exp\{-||x_i - x_j||_2\}. \end{aligned}$$" /></a>
 
@@ -28,6 +28,11 @@ Where:
 - _Mult<sub>inf</sub>_ is the Multinomial distribution, when the number of categories tend to infinity.
 - GEM (for Griffiths, Engen and McCloskey) is a distribution used in Dirichlet Processes' literature, as described in Teh (2010).
 
+## Algorithm
+
+An MCMC algorithm is used to find the _f<sub>p</sub>_'s posterior distribution via simulations, particularly, a _Gibbs sampler_ has been developed.
+
+Since the theoretical model is a nonparametric one, it contemplates infinite parameters, particularly for the dirichlet process. However, it's clear we cannot estimate and allocate such a number of values, so this packages uses the _slice sampling_ algorithm proposed by [Kalli et al.](http://users.wpi.edu/~balnan/Kalli-Griffin-Walker-2011.pdf) to truncate the number of them in a dynamic way. The results approximately converge to the expected ones, if we could do it in the theoretical way.
 
 ## Example
 
