@@ -85,3 +85,7 @@ diagnose(GPDP_MCMC)
 ![Image of autocorrelation](https://github.com/opardo/GPDPQuantReg/blob/master/images/autocorrelation.png)
 ![Image of crosscorrelation](https://github.com/opardo/GPDPQuantReg/blob/master/images/crosscorrelation.png)
 ![Image of trace](https://github.com/opardo/GPDPQuantReg/blob/master/images/trace.png)
+
+## Test
+
+TODO
