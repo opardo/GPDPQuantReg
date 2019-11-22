@@ -67,7 +67,7 @@ GPDP_MCMC <- GPDPQuantReg(y ~ x, sample_data, p = 0.250)
 Since it is a nonparametric model, it is focused on prediction with a credible interval.
 
 ```{r}
-predictive_data <- data_frame(x = seq(-15, 15, 0.25))
+predictive_data <- data.frame(x = seq(-15, 15, 0.25))
 credibility <- 0.90
 prediction <- predict(GPDP_MCMC, predictive_data, credibility)
 ```
